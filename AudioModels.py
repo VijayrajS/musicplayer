@@ -31,7 +31,7 @@ from tinytag import TinyTag as tag_importer
 class AudioObj:
     def __init__(self, SONG_PATH):
 
-        self.time_pt = 0
+        self.pause_flag = 0
         self.song_path = SONG_PATH
         self.metadata, self.img  = self.load_meta()
     
@@ -51,6 +51,9 @@ class AudioObj:
     def seek(self, time):
         pass
 
+    def pause(self):
+        pass
+
 class MP3Obj(AudioObj):
     def __init__(self, SONG_PATH):
         super().__init__(SONG_PATH)
@@ -66,16 +69,33 @@ class MP3Obj(AudioObj):
             pytime.Clock().tick(10)
 
     def seek(self, time):
+        #! Look into this implementation for issues later
         pymixer.music.set_pos(time)
-        # Look into this implementation for issues later
     
     def pause(self):
-        pymixer.music.pause()
+        #! Look into this implementation for issues later
+        if self.pause_flag:
+            pymixer.music.pause()
+
+        else:
+            pymixer.music.unpause()
+
+# Hacky mp3 player implementation
+import os
+if __name__ == "__main__":
+    MUSIC_DIR = '/home/vijayraj/Desktop/Music/'
+    music_list = os.listdir(MUSIC_DIR)
+
+    play_thread = None
+
+    for music in music_list:
+        a = MP3Obj(MUSIC_DIR+music)
+        print(a.metadata)
 
 
-a = MP3Obj('/home/vijayraj/Desktop/Music/CrossOff.mp3')
+        a.load_song()
+        play_thread = threading.Thread(target=a.play_song)
+        play_thread.start()
 
-print(a.metadata)
-t = threading.Thread(target=a.play_song)
-a.load_song()
-a.play_song()
+        play_thread.join()
+        # a.play_song()
