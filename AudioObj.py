@@ -4,7 +4,9 @@ Main interface for any song object
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 
+from pygame import time as pytime
 from pygame import mixer as pymixer
+
 from tinytag import TinyTag as tag_importer
 
 # tag.album         # album as string
@@ -27,13 +29,39 @@ from tinytag import TinyTag as tag_importer
 
 class AudioObj:
     def __init__(self, SONG_PATH):
+
         self.time_pt = 0
         self.song_path = SONG_PATH
         self.metadata, self.img  = self.load_meta()
-        pymixer.init()
     
     def load_song(self):
-        self.song_data = pymixer.music.load(self.song_path)
+        pass
+
+    def load_meta(self):
+        if tag_importer.is_supported(self.song_path):
+            song_tag = tag_importer.get(self.song_path, image=True)
+            return song_tag, song_tag.get_image()
+        else:
+            print('Error: file format not supported')
+
+    def play_song(self):
+        pass
+    
+    def seek(self, time):
+        pass
+
+
+class MP3Obj:
+    def __init__(self, SONG_PATH):
+
+        self.time_pt = 0
+        self.song_path = SONG_PATH
+        self.load_song()
+        self.metadata, self.img = self.load_meta()
+
+    def load_song(self):
+        pymixer.init(44100, -16, 1, 1024)
+        pymixer.music.load(self.song_path)
 
     def load_meta(self):
         if tag_importer.is_supported(self.song_path):
@@ -44,14 +72,15 @@ class AudioObj:
 
     def play_song(self):
         pymixer.music.play()
-    
+        while pymixer.music.get_busy():
+            pytime.Clock().tick(10)
+
     def seek(self, time):
         pass
-
 # class MP3Obj(AudioObj):
 #     def __init__(self, SONG_LOADER, SONG_PATH):
 #         super().__init__(SONG_LOADER, SONG_PATH)
 
-a = AudioObj('/Users/vijayrajs/Downloads/Entertainment/Music/03-imagine_dragons-believer.flac')
+a = MP3Obj('/home/vijayraj/Desktop/Music/CrossOff.mp3')
 a.load_song()
 a.play_song()
