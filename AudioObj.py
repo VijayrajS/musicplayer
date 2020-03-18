@@ -50,25 +50,14 @@ class AudioObj:
     def seek(self, time):
         pass
 
-
-class MP3Obj:
+class MP3Obj(AudioObj):
     def __init__(self, SONG_PATH):
-
-        self.time_pt = 0
-        self.song_path = SONG_PATH
+        super().__init__(SONG_PATH)
         self.load_song()
-        self.metadata, self.img = self.load_meta()
 
     def load_song(self):
         pymixer.init(44100, -16, 1, 1024)
         pymixer.music.load(self.song_path)
-
-    def load_meta(self):
-        if tag_importer.is_supported(self.song_path):
-            song_tag = tag_importer.get(self.song_path, image=True)
-            return song_tag, song_tag.get_image()
-        else:
-            print('Error: file format not supported')
 
     def play_song(self):
         pymixer.music.play()
@@ -77,10 +66,8 @@ class MP3Obj:
 
     def seek(self, time):
         pass
-# class MP3Obj(AudioObj):
-#     def __init__(self, SONG_LOADER, SONG_PATH):
-#         super().__init__(SONG_LOADER, SONG_PATH)
 
 a = MP3Obj('/home/vijayraj/Desktop/Music/CrossOff.mp3')
+print(a.metadata)
 a.load_song()
 a.play_song()
